@@ -55,6 +55,13 @@ sensor_3 = Sensor(3, start_value, 1)
 sensor_4 = Sensor(4, start_value, 1)
 sensor_5 = Sensor(5, start_value, 1)
 
+# Обновление информации в БД
+insert_data(sensor_1.id_sensor, sensor_1.get_state())
+insert_data(sensor_2.id_sensor, sensor_2.get_state())
+insert_data(sensor_3.id_sensor, sensor_3.get_state())
+insert_data(sensor_4.id_sensor, sensor_4.get_state())
+insert_data(sensor_5.id_sensor, sensor_5.get_state())
+
 # Работа системы
 while sensors:
     print('---------------------------')
@@ -63,23 +70,18 @@ while sensors:
         if sensor_1.state == 1:
             print('Парковочное место №', sensor_1.id_sensor)
             sensor_1.set_value()
-            insert_data(sensor_1.id_sensor, sensor_1.get_state())
         if sensor_2.state == 1:
             print('Парковочное место №', sensor_2.id_sensor)
             sensor_2.set_value()
-            insert_data(sensor_2.id_sensor, sensor_2.get_state())
         if sensor_3.state == 1:
             print('Парковочное место №', sensor_3.id_sensor)
             sensor_3.set_value()
-            insert_data(sensor_3.id_sensor, sensor_3.get_state())
         if sensor_4.state == 1:
             print('Парковочное место №', sensor_4.id_sensor)
             sensor_4.set_value()
-            insert_data(sensor_4.id_sensor, sensor_4.get_state())
         if sensor_5.state == 1:
             print('Парковочное место №', sensor_5.id_sensor)
             sensor_5.set_value()
-            insert_data(sensor_5.id_sensor, sensor_5.get_state())
     print('---------------------------')
 
     if sensor_1.state == 0 or sensor_2.state == 0 or sensor_3.state == 0 or sensor_4.state == 0 or sensor_5.state == 0:
