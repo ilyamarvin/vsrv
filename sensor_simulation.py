@@ -7,6 +7,7 @@ from tb_device_mqtt import TBDeviceMqttClient, TBPublishInfo
 
 # Работа датчиков
 smart_sensors = True
+working = True
 # Стартовое значение параметров на датчиках
 start_value = 1000
 
@@ -29,19 +30,33 @@ sensors = {
 }
 
 
-def simulation(x):
-    if x == 1:
-        while smart_sensors:
-            params = random.randint(start_value - 25, start_value + 25)
-            data = "{\"parameter\":" + str(params) + "}"
-            client.publish("v1/devices/me/telemetry", data)
-            time.sleep(5)
-    elif x == 0:
-        while smart_sensors:
-            params = random.randint(start_value*3-25, start_value*3+25)
-            data = "{\"parameter\":" + str(params) + "}"
-            client.publish("v1/devices/me/telemetry", data)
-            time.sleep(5)
+# def simulation(x):
+#     if x == 1:
+#         while smart_sensors:
+#             params = random.randint(start_value - 25, start_value + 25)
+#             data = "{\"parameter\":" + str(params) + "}"
+#             client.publish("v1/devices/me/telemetry", data)
+#             time.sleep(5)
+#     elif x == 0:
+#         while smart_sensors:
+#             params = random.randint(start_value*3-25, start_value*3+25)
+#             data = "{\"parameter\":" + str(params) + "}"
+#             client.publish("v1/devices/me/telemetry", data)
+#             time.sleep(5)
+
+
+# while working:
+#     if sensors.get('sensor_1').params < 2000 or sensors.get('sensor_2').params or sensors.get('sensor_3').params or sensors.get('sensor_2').params:
+#         print('Свободные парковочные места: ')
+#         if sensors.get('sensor_1').params < 2000:
+#             print('Место №', sensors.get('sensor_1').id_sensor)
+#         if sensors.get('sensor_2').params < 2000:
+#             print('Место №', sensors.get('sensor_2').id_sensor)
+#         if sensors.get('sensor_3').params < 2000:
+#             print('Место №', sensors.get('sensor_3').id_sensor)
+#         if sensors.get('sensor_4').params < 2000:
+#             print('Место №', sensors.get('sensor_4').id_sensor)
+#     break
 
 
 def empty_parking_slots():
@@ -56,9 +71,9 @@ def empty_parking_slots():
         # Connect to ThingsBoard
         client.connect()
         # Sending telemetry without checking the delivery status
-        client.send_telemetry(telemetry)
+        client.send_attributes(telemetry)
         # Sending telemetry and checking the delivery status (QoS = 1 by default)
-        result = client.send_telemetry(telemetry)
+        result = client.send_attributes(telemetry)
         # get is a blocking call that awaits delivery status
         success = result.get() == TBPublishInfo.TB_ERR_SUCCESS
         # Disconnect from ThingsBoard

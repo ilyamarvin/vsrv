@@ -35,6 +35,6 @@ def callback(result):
 
 client = TBDeviceMqttClient(THINGSBOARD_HOST, ACCESS_TOKEN)
 client.connect()
-client.subscribe_to_attribute("parameter", callback)
+client.subscribe_to_all_attributes(callback)
 while True:
     sleep(1)
