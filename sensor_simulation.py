@@ -30,20 +30,48 @@ sensors = {
 }
 
 
-# def simulation(x):
-#     if x == 1:
-#         while smart_sensors:
-#             params = random.randint(start_value - 25, start_value + 25)
-#             data = "{\"parameter\":" + str(params) + "}"
-#             client.publish("v1/devices/me/telemetry", data)
-#             time.sleep(5)
-#     elif x == 0:
-#         while smart_sensors:
-#             params = random.randint(start_value*3-25, start_value*3+25)
-#             data = "{\"parameter\":" + str(params) + "}"
-#             client.publish("v1/devices/me/telemetry", data)
-#             time.sleep(5)
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Connected to MQTT Broker!")
+    else:
+        print("Failed to connect, return code %d\n", rc)
 
+
+def on_publish(client, userdata, result):
+    print("Data from sensor published to ThingsBoard\n")
+    pass
+
+
+client = mqtt_client.Client('Client')
+client.on_connect = on_connect
+client.on_publish = on_publish
+client.username_pw_set(ACCESS_TOKEN)
+
+client.connect(THINGSBOARD_HOST, port)
+print('Connected to ThingsBoard', THINGSBOARD_HOST)
+time.sleep(1)
+
+
+def simulation(x):
+    if x == 1:
+        while smart_sensors:
+            client.loop_start()
+            params = random.randint(start_value - 25, start_value + 25)
+            data = "{\"value\":" + str(params) + "}"
+            client.publish("v1/devices/me/telemetry", data)
+            time.sleep(5)
+            client.loop_stop()
+    elif x == 0:
+        while smart_sensors:
+            client.loop_start()
+            params = random.randint(start_value*3-25, start_value*3+25)
+            data = "{\"value\":" + str(params) + "}"
+            client.publish("v1/devices/me/telemetry", data)
+            time.sleep(5)
+            client.loop_stop()
+
+
+simulation(0)
 
 # while working:
 #     if sensors.get('sensor_1').params < 2000 or sensors.get('sensor_2').params or sensors.get('sensor_3').params or sensors.get('sensor_2').params:
@@ -59,25 +87,25 @@ sensors = {
 #     break
 
 
-def empty_parking_slots():
-    while smart_sensors:
-        params1 = random.randint(start_value - 25, start_value + 25)
-        params2 = random.randint(start_value - 25, start_value + 25)
-        params3 = random.randint(start_value - 25, start_value + 25)
-        params4 = random.randint(start_value - 25, start_value + 25)
-        telemetry = {list(sensors.keys())[0]: params1, list(sensors.keys())[1]: params2,
-                     list(sensors.keys())[2]: params3, list(sensors.keys())[3]: params4}
-        client = TBDeviceMqttClient(THINGSBOARD_HOST, ACCESS_TOKEN)
-        # Connect to ThingsBoard
-        client.connect()
-        # Sending telemetry without checking the delivery status
-        client.send_attributes(telemetry)
-        # Sending telemetry and checking the delivery status (QoS = 1 by default)
-        result = client.send_attributes(telemetry)
-        # get is a blocking call that awaits delivery status
-        success = result.get() == TBPublishInfo.TB_ERR_SUCCESS
-        # Disconnect from ThingsBoard
-        client.disconnect()
-
-
-empty_parking_slots()
+# def empty_parking_slots():
+#     while smart_sensors:
+#         params1 = random.randint(start_value - 25, start_value + 25)
+#         params2 = random.randint(start_value - 25, start_value + 25)
+#         params3 = random.randint(start_value - 25, start_value + 25)
+#         params4 = random.randint(start_value - 25, start_value + 25)
+#         telemetry = {list(sensors.keys())[0]: params1, list(sensors.keys())[1]: params2,
+#                      list(sensors.keys())[2]: params3, list(sensors.keys())[3]: params4}
+#         client = TBDeviceMqttClient(THINGSBOARD_HOST, ACCESS_TOKEN)
+#         # Connect to ThingsBoard
+#         client.connect()
+#         # Sending telemetry without checking the delivery status
+#         client.send_attributes(telemetry)
+#         # Sending telemetry and checking the delivery status (QoS = 1 by default)
+#         result = client.send_attributes(telemetry)
+#         # get is a blocking call that awaits delivery status
+#         success = result.get() == TBPublishInfo.TB_ERR_SUCCESS
+#         # Disconnect from ThingsBoard
+#         client.disconnect()
+#
+#
+# empty_parking_slots()
