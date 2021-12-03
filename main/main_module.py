@@ -18,10 +18,10 @@ cur = conn.cursor()
 x = random.randint(0, 1)
 print(x)
 
-# if x == 1:
-#     cur.execute("INSERT INTO parking (place_id, state_id, date, time) VALUES (%s, %s, %s, %s)",
-#                 (4, 0, datetime.date.today(), time.strftime("%H:%M:%S")))
-#     conn.commit()
+if x == 1:
+    cur.execute("INSERT INTO parking (place_id, state_id, date, time) VALUES (%s, %s, %s, %s)",
+                (4, 0, datetime.date.today(), time.strftime("%H:%M:%S")))
+    conn.commit()
 
 cur.execute(
     "SELECT place_name, state_name, max(date), max(time) FROM parking, place, state "
