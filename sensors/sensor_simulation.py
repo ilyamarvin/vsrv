@@ -73,15 +73,15 @@ while True:
         if 1 <= y <= 5:
             for i in sensors:
                 x = sensors.get(i)
-                if y == x.id_sensor and x.state:
-                    print('Вы заняли место!')
-                    x.set_state(False)
-                    x.set_value()
-                    client.publish(f"sensors/sensor_{x.id_sensor}", x.get_value())
-                else:
-                    print('Это место занято! Выберите другое место')
-                    break
-                break
+                if y == x.id_sensor:
+                    if x.state:
+                        print('Вы заняли место!')
+                        x.set_state(False)
+                        x.set_value()
+                        client.publish(f"sensors/sensor_{x.id_sensor}", x.get_value())
+                    else:
+                        print('Это место занято! Выберите другое место')
+                        break
         else:
             print('Вы ввели неверное значение, нужно вводить число от 1 до 5')
             break
