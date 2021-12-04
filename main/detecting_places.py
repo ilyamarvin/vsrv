@@ -29,10 +29,6 @@ sensors = {
 }
 
 
-def sending_data():
-    print(sensors)
-
-
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to MQTT Broker!")
@@ -62,7 +58,6 @@ def on_message(client, userdata, msg):
         x = cur.fetchone()
         place_id = int(x[0])
         place_state = int(x[1])
-        print(place_id)
 
         if (sensors[list(sensors.keys())[i]] < 2000 and place_state == 1) or \
                 (sensors[list(sensors.keys())[i]] > 2000 and place_state == 0):
