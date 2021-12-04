@@ -37,9 +37,9 @@ def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to MQTT Broker!")
         client.subscribe('sensors/#')
-        for i in sensors:
+        for i in range(5):
             cur.execute("INSERT INTO parking (place_id, state_id, date, time) VALUES (%s, %s, %s, %s)",
-                        (i, 1, datetime.date.today(), time.strftime("%H:%M:%S")))
+                        (i+1, 1, datetime.date.today(), time.strftime("%H:%M:%S")))
             conn.commit()
     else:
         print("Failed to connect, return code %d\n", rc)
@@ -47,16 +47,36 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
+
+    cur.execute("WITH a AS(SELECT place_id, max(id) AS msx FROM parking GROUP BY place_id) "
+                "SELECT a.place_id, state_id, parking.date, parking.time "
+                "FROM parking INNER JOIN place on parking.place_id=place.id "
+                "INNER JOIN state ON parking.state_id=state.id "
+                "INNER JOIN a ON parking.id=a.msx "
+                "ORDER BY place_id")
+
     for i in range(5):
         if msg.topic == f'sensors/{list(sensors.keys())[i]}':
             sensors[list(sensors.keys())[i]] = int(msg.payload.decode())
-            cur.execute("WITH a AS(SELECT place_id, max(id) AS msx FROM parking GROUP BY place_id) "
-                        "SELECT place.place_name, state.state_name, parking.date, parking.time "
-                        "FROM parking INNER JOIN place on parking.place_id=place.id "
-                        "INNER JOIN state ON parking.state_id=state.id "
-                        "INNER JOIN a ON parking.id=a.msx "
-                        "ORDER BY place_name")
-            cur.fetchall()
+
+        x = cur.fetchone()
+        place_id = int(x[0])
+        place_state = int(x[1])
+        print(place_id)
+
+        if (sensors[list(sensors.keys())[i]] < 2000 and place_state == 1) or \
+                (sensors[list(sensors.keys())[i]] > 2000 and place_state == 0):
+            pass
+        elif sensors[list(sensors.keys())[i]] > 2000 and place_state == 1:
+            cur.execute("INSERT INTO parking (place_id, state_id, date, time) VALUES (%s, %s, %s, %s)",
+                        (i+1, 0, datetime.date.today(), time.strftime("%H:%M:%S")))
+            conn.commit()
+            break
+        elif sensors[list(sensors.keys())[i]] < 2000 and place_state == 0:
+            cur.execute("INSERT INTO parking (place_id, state_id, date, time) VALUES (%s, %s, %s, %s)",
+                        (i+1, 1, datetime.date.today(), time.strftime("%H:%M:%S")))
+            conn.commit()
+            break
 
 
 while True:
